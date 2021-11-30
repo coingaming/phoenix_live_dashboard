@@ -55,6 +55,7 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
           <tr><td>Garbage collection</td><td><pre><%= @garbage_collection %></pre></td></tr>
           <tr><td>Suspending</td><td><pre><%= @suspending %></pre></td></tr>
           <tr><td>Current stacktrace</td><td><pre><%= @current_stacktrace %></pre></td></tr>
+          <tr><td>Current state</td><td><pre><%= @current_state %></pre></td></trunc()>
         </tbody>
       </table>
     </div>
@@ -95,6 +96,7 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
   defp inspect_info(:current_function, val, _), do: SystemInfo.format_call(val)
   defp inspect_info(:initial_call, val, _), do: SystemInfo.format_call(val)
   defp inspect_info(:current_stacktrace, val, _), do: format_stack(val)
+  defp inspect_info(:current_state, val, _), do: format_state(val)
   defp inspect_info(_key, val, link_builder), do: inspect_val(val, link_builder)
 
   defp inspect_val(pid, link_builder) when is_pid(pid) do
@@ -122,5 +124,10 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
     |> String.split("\n")
     |> Enum.map(&String.replace_prefix(&1, "   ", ""))
     |> Enum.join("\n")
+  end
+
+  defp format_state(state) do
+    :io_lib.format("~p",[state])
+    |> List.flatten()
   end
 end
