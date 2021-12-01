@@ -119,6 +119,10 @@ defmodule Phoenix.LiveDashboard.ProcessesLive do
     {:noreply, fetch_processes(socket)}
   end
 
+  def handle_info(_, socket) do
+    {:noreply, fetch_processes(socket)}
+  end
+
   @impl true
   def handle_event("search", %{"search" => search}, socket) do
     %{menu: menu, params: params} = socket.assigns

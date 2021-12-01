@@ -108,9 +108,10 @@ defmodule Phoenix.LiveDashboard.SystemInfo do
   def process_info_callback(pid, keys) do
     case Process.info(pid, keys) do
       [_ | _] = info ->
+        {:ok, info}
 
-        {:ok, [{:current_state, :sys.get_state(pid)} | info]}
-      nil -> :error
+      nil ->
+        :error
     end
   end
 

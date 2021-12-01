@@ -55,7 +55,7 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
           <tr><td>Garbage collection</td><td><pre><%= @garbage_collection %></pre></td></tr>
           <tr><td>Suspending</td><td><pre><%= @suspending %></pre></td></tr>
           <tr><td>Current stacktrace</td><td><pre><%= @current_stacktrace %></pre></td></tr>
-          <tr><td>Current state</td><td><pre><%= @current_state %></pre></td></trunc()>
+          <tr><td>Current state</td><td><pre><%= @current_state %></pre></td></tr>
         </tbody>
       </table>
     </div>
@@ -83,9 +83,26 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
           assign(acc, key, inspect_info(key, val, assigns.pid_link_builder))
         end)
         |> assign(alive: true)
+        |> assign_state(assigns.pid)
 
       :error ->
         assign(socket, alive: false)
+        |> assign(current_state: "")
+    end
+  end
+
+  defp assign_state(socket, pid) do
+    try do
+      unless socket.assigns.current_function == "Process.info/2" do
+        assign(socket, :current_state, format_state(:sys.get_state(pid, 100)))
+      else
+        assign(socket, :current_state, nil)
+      end
+    catch
+      :exit, _ ->
+        assign(socket, current_state: nil)
+      :unknown_system_msg, _ ->
+        assign(socket, current_state: nil)
     end
   end
 
@@ -127,7 +144,7 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
   end
 
   defp format_state(state) do
-    :io_lib.format("~p",[state])
+    :io_lib.format("~p", [state])
     |> List.flatten()
   end
 end
