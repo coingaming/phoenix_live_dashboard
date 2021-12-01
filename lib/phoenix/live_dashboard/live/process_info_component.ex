@@ -92,17 +92,18 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
   end
 
   defp assign_state(socket, pid) do
-    try do
-      unless socket.assigns.current_function == "Process.info/2" do
+    if String.to_integer(socket.assigns.total_heap_size) < 6_250_000 do
+      try do
         assign(socket, :current_state, format_state(:sys.get_state(pid, 100)))
-      else
-        assign(socket, :current_state, nil)
+      catch
+        :exit, _ ->
+          assign(socket, current_state: nil)
+
+        :unknown_system_msg, _ ->
+          assign(socket, current_state: nil)
       end
-    catch
-      :exit, _ ->
-        assign(socket, current_state: nil)
-      :unknown_system_msg, _ ->
-        assign(socket, current_state: nil)
+    else
+      assign(socket, current_state: nil)
     end
   end
 
