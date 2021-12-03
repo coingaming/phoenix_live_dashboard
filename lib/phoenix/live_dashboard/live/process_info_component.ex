@@ -88,6 +88,10 @@ defmodule Phoenix.LiveDashboard.ProcessInfoComponent do
       :error ->
         assign(socket, alive: false)
         |> assign(current_state: "")
+
+      {:badrpc, {:EXIT, {:timeout, {:sys, :get_state, [_pid]}}}} ->
+        assign(socket, alive: true)
+        |> assign(current_state: nil)
     end
   end
 
